@@ -16,6 +16,7 @@ func ReadLastLine(fileName string) (data []byte, err error) {
 		return
 	}
 
+	defer f.Close()
 	var info os.FileInfo
 	info, err = f.Stat()
 	if err != nil {
