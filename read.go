@@ -77,7 +77,7 @@ func read(f *os.File, fileSize int64) (data []byte, n int, err error) {
 			piecesLengthArray = append(piecesLengthArray, sizeWillRead)
 			buf.Write(b)
 			if sizeHasRead >= fileSize {
-				return bytesReassemble(buf.Bytes(), piecesLengthArray), (int(offset) + len(sep)), nil
+				return bytesReassemble(buf.Bytes(), piecesLengthArray), int(offset), nil
 			}
 			continue
 		}

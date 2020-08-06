@@ -27,3 +27,14 @@ func TestReadLastLineNoEOL(t *testing.T) {
 	assert.Equal("Goodbye World!", line)
 	assert.Equal(13, n)
 }
+
+func TestReadLastLineOnlyLine(t *testing.T) {
+	assert := assert.New(t)
+
+	data, n, err := ReadLastLine("testdata/onlyline.txt")
+	assert.NoError(err)
+
+	line := string(data)
+	assert.Equal("Hello World!", line)
+	assert.Equal(0, n)
+}
