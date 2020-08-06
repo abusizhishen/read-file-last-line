@@ -9,7 +9,7 @@ import (
 
 const initReadSize = 2 << 4
 
-func ReadLastLine(fileName string) (data []byte, err error) {
+func ReadLastLine(fileName string) (data []byte, offset int, err error) {
 	var f *os.File
 	f, err = os.Open(fileName)
 	if err != nil {
@@ -31,7 +31,7 @@ func ReadLastLine(fileName string) (data []byte, err error) {
 	return read(f, info.Size())
 }
 
-func read(f *os.File, fileSize int64) (data []byte, err error) {
+func read(f *os.File, fileSize int64) (data []byte, n int, err error) {
 	var piecesLengthArray []int64
 	var buf = bytes.Buffer{}
 
@@ -50,7 +50,7 @@ func read(f *os.File, fileSize int64) (data []byte, err error) {
 	//ignore the last line break if exists
 	b = make([]byte, len(sep))
 	if _, err = f.ReadAt(b, fileSize-int64(len(sep))); err != nil {
-		return nil, err
+		return nil, 0, err
 	} else if bytes.Equal(b, sep) {
 		fileSize -= int64(len(sep))
 	}
@@ -77,7 +77,7 @@ func read(f *os.File, fileSize int64) (data []byte, err error) {
 			piecesLengthArray = append(piecesLengthArray, sizeWillRead)
 			buf.Write(b)
 			if sizeHasRead >= fileSize {
-				return bytesReassemble(buf.Bytes(), piecesLengthArray), nil
+				return bytesReassemble(buf.Bytes(), piecesLengthArray), int(offset), nil
 			}
 			continue
 		}
@@ -86,7 +86,7 @@ func read(f *os.File, fileSize int64) (data []byte, err error) {
 		//fmt.Println(  "sepIndex:", sepIndex)
 		//fmt.Println("bytes: ",string(buf.Bytes()))
 
-		return bytesReassemble(buf.Bytes(), piecesLengthArray), nil
+		return bytesReassemble(buf.Bytes(), piecesLengthArray), (int(offset) + sepIndex + len(sep)), nil
 	}
 }
 
